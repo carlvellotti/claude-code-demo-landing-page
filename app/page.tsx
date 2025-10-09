@@ -14,13 +14,21 @@ export default function Home() {
 
     if (email) {
       try {
-        await fetch('/api/submit-email', {
+        const response = await fetch('/api/submit-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('Error submitting email:', data);
+          alert(`Error: ${data.message || 'Failed to submit email'}`);
+        }
       } catch (error) {
         console.error('Error submitting email:', error);
+        alert('Network error: Could not submit email');
       }
     }
 
