@@ -58,17 +58,22 @@ export default function Instructions() {
         </p>
         {/* Video Section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Watch the Demo</h2>
-          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-            <iframe
-              className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-              src="https://www.youtube.com/embed/4nthc76rSl8?enablejsapi=1"
-              title="Claude Code Demo"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Watch the Demo</h2>
+          <div className="max-w-2xl mx-auto">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                src="https://www.youtube.com/embed/4nthc76rSl8?enablejsapi=1"
+                title="Claude Code Demo"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
+            <p className="text-center text-gray-600 text-sm mt-3 italic">
+              Yes this is kind of a jump scare 👀
+            </p>
+          </div>
+        </div>
 
         <div className="mb-12 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100 shadow-sm">
           <h3 className="text-lg font-semibold text-green-900 mb-2">📦 Get the Repository</h3>
