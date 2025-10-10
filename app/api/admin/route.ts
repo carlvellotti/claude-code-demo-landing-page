@@ -1,6 +1,10 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
+// Force no caching
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Create table if it doesn't exist
@@ -12,17 +16,25 @@ export async function GET() {
       );
     `;
 
-    // Query all emails
+    // Query all emails - force consistent read by querying with NOW()
     const { rows } = await sql`
       SELECT * FROM emails 
       ORDER BY created_at DESC;
     `;
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true,
       count: rows.length,
-      emails: rows 
+      emails: rows,
+      timestamp: new Date().toISOString()
     });
+    
+    // Prevent any caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('CDN-Cache-Control', 'no-store');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching emails:', error);
     return NextResponse.json({ 
