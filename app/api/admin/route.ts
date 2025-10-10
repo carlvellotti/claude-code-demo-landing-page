@@ -12,11 +12,21 @@ export async function GET() {
       CREATE TABLE IF NOT EXISTS emails (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
+        source VARCHAR(100),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
-    // Query all emails - force consistent read by querying with NOW()
+    // Add source column if it doesn't exist (for existing tables)
+    try {
+      await sql`
+        ALTER TABLE emails ADD COLUMN IF NOT EXISTS source VARCHAR(100);
+      `;
+    } catch (e) {
+      // Column might already exist, that's fine
+    }
+
+    // Query all emails
     const { rows } = await sql`
       SELECT * FROM emails 
       ORDER BY created_at DESC;

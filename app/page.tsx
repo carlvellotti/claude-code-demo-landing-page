@@ -24,7 +24,10 @@ export default function Home() {
         const response = await fetch('/api/submit-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ 
+            email,
+            source: 'claude_code_demo_file'
+          }),
         });
         
         const data = await response.json();
