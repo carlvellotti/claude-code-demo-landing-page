@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       success: true,
-      stored: result.rowCount > 0,
+      stored: result.rowCount ? result.rowCount > 0 : false,
       email: email 
     });
   } catch (error) {
