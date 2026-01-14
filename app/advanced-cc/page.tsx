@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 declare global {
@@ -12,7 +12,12 @@ declare global {
 export default function AdvancedClaudeCode() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,12 +139,101 @@ export default function AdvancedClaudeCode() {
             textAlign: 'center',
             color: '#9ca3af',
             fontSize: '15px',
-            marginBottom: '28px',
+            marginBottom: '24px',
             lineHeight: '1.5',
           }}>
             The complete advanced guide for PMs.<br />
             MCPs, workflows, automation — everything.
           </p>
+
+          {/* Form - moved up right after subhead */}
+          <form onSubmit={handleSubmit} style={{ marginBottom: '24px' }}>
+            <div style={{ position: 'relative', marginBottom: '12px' }}>
+              <span style={{
+                position: 'absolute',
+                left: '14px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#f59e0b',
+                fontFamily: 'monospace',
+                fontSize: '14px',
+              }}>&gt;</span>
+              <input
+                ref={inputRef}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                style={{
+                  width: '100%',
+                  padding: '14px 14px 14px 32px',
+                  background: '#141414',
+                  border: '1px solid #333',
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px 24px',
+                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#000000',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              {loading ? 'Processing...' : 'Get Demo Files →'}
+            </button>
+
+            <p style={{
+              textAlign: 'center',
+              fontSize: '12px',
+              color: '#6b7280',
+              marginTop: '12px',
+            }}>
+              Join{' '}
+              <a
+                href="https://fullstack-pm.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#f59e0b', textDecoration: 'underline' }}
+              >
+                The Full Stack PM
+              </a>
+              {' '}newsletter
+            </p>
+
+            <button
+              type="button"
+              onClick={handleSkip}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '12px',
+                background: 'transparent',
+                border: 'none',
+                color: '#6b7280',
+                fontSize: '13px',
+                cursor: 'pointer',
+                marginTop: '4px',
+              }}
+            >
+              skip — just show me the files
+            </button>
+          </form>
 
           {/* Stats */}
           <div style={{
@@ -178,7 +272,6 @@ export default function AdvancedClaudeCode() {
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '8px',
-            marginBottom: '24px',
           }}>
             {['MCP Setup', 'Linear Integration', 'Custom Skills', 'Image Gen API', 'Hooks', 'GitHub Actions'].map((topic, i) => (
               <div key={i} style={{
@@ -192,93 +285,6 @@ export default function AdvancedClaudeCode() {
               }}>{topic}</div>
             ))}
           </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit}>
-            <div style={{ position: 'relative', marginBottom: '12px' }}>
-              <span style={{
-                position: 'absolute',
-                left: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#f59e0b',
-                fontFamily: 'monospace',
-                fontSize: '14px',
-              }}>&gt;</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                style={{
-                  width: '100%',
-                  padding: '14px 14px 14px 32px',
-                  background: '#141414',
-                  border: '1px solid #333',
-                  borderRadius: '8px',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '14px 24px',
-                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#000000',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              {loading ? 'Processing...' : 'Get Demo Files →'}
-            </button>
-          </form>
-
-          <p style={{
-            textAlign: 'center',
-            fontSize: '12px',
-            color: '#6b7280',
-            marginTop: '12px',
-          }}>
-            Join{' '}
-            <a
-              href="https://fullstack-pm.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#f59e0b', textDecoration: 'underline' }}
-            >
-              The Full Stack PM
-            </a>
-            {' '}newsletter
-          </p>
-
-          <button
-            onClick={handleSkip}
-            style={{
-              display: 'block',
-              width: '100%',
-              padding: '12px',
-              background: 'transparent',
-              border: 'none',
-              color: '#6b7280',
-              fontSize: '13px',
-              cursor: 'pointer',
-              marginTop: '8px',
-            }}
-          >
-            skip — just show me the files
-          </button>
         </div>
       </div>
     </div>

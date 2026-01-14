@@ -1,240 +1,461 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
 
 export default function AdvancedInstructions() {
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const copyToClipboard = async (text: string, index: number) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin === 'https://www.youtube.com') {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.event === 'onStateChange') {
+            if (data.info === 1 && window.gtag) {
+              window.gtag('event', 'video_play', {
+                event_category: 'engagement',
+                event_label: 'advanced_cc_demo_video'
+              });
+            }
+          }
+        } catch (e) {}
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const trackGitHubClick = (location: string) => {
+    if (window.gtag) {
+      window.gtag('event', 'github_click', {
+        event_category: 'conversion',
+        event_label: `advanced_cc_${location}`
+      });
     }
   };
-
-  const steps = [
-    {
-      title: 'Clone the Demo Repo',
-      description: 'Get all the starter files for the tutorial',
-      code: 'git clone https://github.com/carlvellotti/taskflow-calendar-demo.git',
-    },
-    {
-      title: 'Copy Start Files',
-      description: 'Move starter files to your working directory',
-      code: 'cd taskflow-calendar-demo && cp -r start/* .',
-    },
-    {
-      title: 'Set Up Environment',
-      description: 'Configure your API keys for Gemini and Linear',
-      code: 'cp .env.example .env && open .env',
-    },
-    {
-      title: 'Install Dependencies',
-      description: 'Install Python packages for image generation',
-      code: 'pip install google-genai pillow python-dotenv',
-    },
-    {
-      title: 'Connect Linear MCP',
-      description: 'Set up the Linear integration for ticket creation',
-      code: 'npx -y mcp-remote https://mcp.linear.app/mcp',
-    },
-  ];
-
-  const resources = [
-    { icon: '▶', label: 'Watch Video', sub: '81 min tutorial', href: 'https://www.youtube.com/watch?v=59gy_24KIVE' },
-    { icon: '◈', label: 'GitHub Repo', sub: 'Demo files', href: 'https://github.com/carlvellotti/taskflow-calendar-demo' },
-    { icon: '◉', label: 'Written Guide', sub: "Aakash's blog", href: 'https://www.news.aakashg.com/p/carl-vellotti-podcast-2' },
-    { icon: '●', label: 'Follow Carl', sub: 'LinkedIn', href: 'https://linkedin.com/in/carlvellotti' },
-  ];
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)',
+      background: '#0a0a0b',
+      color: '#fafafa',
       fontFamily: 'system-ui, -apple-system, sans-serif',
     }}>
-      {/* Header */}
-      <div style={{
-        textAlign: 'center',
-        padding: '48px 24px 32px',
-        borderBottom: '1px solid #2a2a2a',
-      }}>
-        <h1 style={{
-          fontSize: '28px',
-          fontWeight: '700',
-          color: '#ffffff',
-          marginBottom: '8px',
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 24px' }}>
+
+        {/* Header */}
+        <header style={{ marginBottom: '48px' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            background: 'rgba(217, 119, 6, 0.15)',
+            border: '1px solid rgba(217, 119, 6, 0.3)',
+            borderRadius: '100px',
+            fontSize: '11px',
+            fontWeight: '600',
+            color: '#f59e0b',
+            marginBottom: '16px',
+          }}>
+            <span style={{ color: '#22c55e' }}>●</span> ADVANCED GUIDE
+          </div>
+          <h1 style={{
+            fontSize: '42px',
+            fontWeight: '700',
+            marginBottom: '12px',
+            lineHeight: '1.1',
+          }}>
+            Advanced Claude Code<br />
+            <span style={{ color: '#f59e0b' }}>for Product Managers</span>
+          </h1>
+          <p style={{ color: '#71717a', fontSize: '18px', maxWidth: '600px' }}>
+            MCPs, end-to-end workflows, hooks, and GitHub automation — the complete masterclass.
+          </p>
+        </header>
+
+        {/* Video */}
+        <section style={{
+          background: '#111113',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '32px',
         }}>
-          Setup <span style={{ color: '#f59e0b', fontStyle: 'italic' }}>Instructions</span>
-        </h1>
-        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-          Follow along with the Advanced Claude Code tutorial
-        </p>
-      </div>
-
-      {/* Steps */}
-      <div style={{
-        maxWidth: '640px',
-        margin: '0 auto',
-        padding: '32px 24px',
-      }}>
-        {steps.map((step, index) => (
-          <div
-            key={index}
-            style={{
-              background: '#1f1f1f',
-              border: '1px solid #333',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '16px',
-              padding: '20px',
-            }}>
-              <div style={{
-                width: '28px',
-                height: '28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(217, 119, 6, 0.15)',
-                border: '1px solid rgba(217, 119, 6, 0.3)',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#f59e0b',
-                flexShrink: 0,
-              }}>
-                {index + 1}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{
-                  color: '#ffffff',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  marginBottom: '4px',
-                }}>
-                  {step.title}
-                </div>
-                <div style={{
-                  color: '#6b7280',
-                  fontSize: '13px',
-                }}>
-                  {step.description}
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              background: '#141414',
-              borderTop: '1px solid #2a2a2a',
-              padding: '14px 20px',
-            }}>
-              <span style={{
-                color: '#f59e0b',
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                flexShrink: 0,
-              }}>$</span>
-              <code style={{
-                flex: 1,
-                fontFamily: 'monospace',
-                fontSize: '13px',
-                color: '#9ca3af',
-                overflowX: 'auto',
-                whiteSpace: 'nowrap',
-              }}>
-                {step.code}
-              </code>
-              <button
-                onClick={() => copyToClipboard(step.code, index)}
+          <div style={{
+            padding: '12px 20px',
+            borderBottom: '1px solid #27272a',
+            background: '#18181b',
+            fontSize: '12px',
+            color: '#71717a',
+          }}>
+            // watch the tutorial
+          </div>
+          <div style={{ padding: '20px' }}>
+            <div style={{ position: 'relative', paddingBottom: '56.25%' }}>
+              <iframe
                 style={{
-                  padding: '6px 12px',
-                  background: '#1f1f1f',
-                  border: '1px solid #333',
-                  borderRadius: '6px',
-                  color: copiedIndex === index ? '#22c55e' : '#6b7280',
-                  fontFamily: 'monospace',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                  flexShrink: 0,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '4px',
                 }}
-              >
-                {copiedIndex === index ? '✓ copied' : 'copy'}
-              </button>
+                src="https://www.youtube.com/embed/59gy_24KIVE?enablejsapi=1"
+                title="Advanced Claude Code for PMs"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
           </div>
-        ))}
-      </div>
+        </section>
 
-      {/* Resources */}
-      <div style={{
-        maxWidth: '640px',
-        margin: '0 auto',
-        padding: '0 24px 48px',
-      }}>
-        <div style={{
-          fontSize: '11px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          color: '#6b7280',
-          marginBottom: '16px',
+        {/* Get Started */}
+        <section style={{
+          background: 'linear-gradient(135deg, #18181b, #111113)',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '32px',
+          position: 'relative',
+          overflow: 'hidden',
         }}>
-          Resources
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px',
-        }}>
-          {resources.map((resource, i) => (
-            <a
-              key={i}
-              href={resource.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '16px',
-                background: '#1f1f1f',
-                border: '1px solid #333',
-                borderRadius: '10px',
-                textDecoration: 'none',
-              }}
-            >
-              <span style={{ fontSize: '18px', color: '#f59e0b' }}>{resource.icon}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: 'linear-gradient(90deg, #d97706, #b45309, transparent)',
+          }} />
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}>
+            <div>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>Get Started</h3>
+              <p style={{ color: '#71717a', fontSize: '14px' }}>
+                Give this link to Claude Code and it will set everything up for you
+              </p>
+            </div>
+            <div style={{
+              background: '#000',
+              border: '1px solid #27272a',
+              borderRadius: '6px',
+              padding: '14px 16px',
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              color: '#22c55e',
+              overflowX: 'auto',
+            }}>
+              https://github.com/carlvellotti/taskflow-calendar-demo
+            </div>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <a
+                href="https://github.com/carlvellotti/taskflow-calendar-demo"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackGitHubClick('main_cta')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'linear-gradient(135deg, #d97706, #b45309)',
+                  color: '#000',
+                  padding: '12px 24px',
+                  borderRadius: '6px',
+                  fontWeight: '600',
                   fontSize: '14px',
-                  color: '#ffffff',
-                  fontWeight: '500',
+                  textDecoration: 'none',
+                }}
+              >
+                → View on GitHub
+              </a>
+              <a
+                href="https://www.news.aakashg.com/p/carl-vellotti-podcast-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'transparent',
+                  color: '#a1a1aa',
+                  padding: '12px 24px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                  border: '1px solid #27272a',
+                }}
+              >
+                Read the Written Guide
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* What You'll Learn */}
+        <section style={{
+          background: '#111113',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '32px',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 20px',
+            borderBottom: '1px solid #27272a',
+            background: '#18181b',
+          }}>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              padding: '4px 10px',
+              background: '#f59e0b',
+              color: '#000',
+              borderRadius: '4px',
+            }}>01</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>What You&apos;ll Learn</span>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '16px',
+            }}>
+              {[
+                { title: 'MCP Setup', items: ['Connect Linear, Google Drive, Slack', 'Essential PM MCP stack', 'Live Linear demo'] },
+                { title: 'End-to-End Workflows', items: ['Survey → PRD → Deck → Tickets', 'Skills for reusable prompts', 'Direct quotes from research'] },
+                { title: 'Advanced Features', items: ['Hooks for automation', 'Image gen with Gemini API', 'GitHub remote workers'] },
+              ].map((section, i) => (
+                <div key={i} style={{
+                  background: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '6px',
+                  padding: '16px',
                 }}>
-                  {resource.label}
+                  <h4 style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#f59e0b',
+                    marginBottom: '12px',
+                  }}>{section.title}</h4>
+                  <ul style={{
+                    margin: 0,
+                    paddingLeft: '16px',
+                    fontSize: '13px',
+                    color: '#a1a1aa',
+                  }}>
+                    {section.items.map((item, j) => (
+                      <li key={j} style={{ margin: '6px 0' }}>{item}</li>
+                    ))}
+                  </ul>
                 </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#6b7280',
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Video Chapters */}
+        <section style={{
+          background: '#111113',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '32px',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 20px',
+            borderBottom: '1px solid #27272a',
+            background: '#18181b',
+          }}>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              padding: '4px 10px',
+              background: '#f59e0b',
+              color: '#000',
+              borderRadius: '4px',
+            }}>02</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>Video Chapters</span>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '8px',
+            }}>
+              {[
+                { time: '0:00', title: 'Intro' },
+                { time: '2:14', title: 'Why Claude Code Hit $1B ARR' },
+                { time: '11:04', title: 'Setting Up Linear MCP' },
+                { time: '14:07', title: 'Essential MCP Stack for PMs' },
+                { time: '21:25', title: 'End-to-End PM Workflow' },
+                { time: '28:00', title: 'Skills Introduction' },
+                { time: '38:00', title: 'Image Generation with Gemini' },
+                { time: '44:12', title: 'Creating PRD from Survey' },
+                { time: '51:00', title: 'Hooks Feature' },
+                { time: '55:30', title: 'Creating Presentation from PRD' },
+                { time: '1:01:49', title: 'Creating 19 Linear Tickets' },
+                { time: '1:08:08', title: 'GitHub Integration & Remote Workers' },
+              ].map((chapter, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 12px',
+                  background: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '6px',
                 }}>
-                  {resource.sub}
+                  <span style={{
+                    fontFamily: 'monospace',
+                    fontSize: '12px',
+                    color: '#22d3ee',
+                    minWidth: '50px',
+                  }}>{chapter.time}</span>
+                  <span style={{ fontSize: '13px', color: '#a1a1aa' }}>{chapter.title}</span>
                 </div>
-              </div>
-              <span style={{ color: '#f59e0b', fontSize: '14px' }}>→</span>
-            </a>
-          ))}
-        </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Repo Structure */}
+        <section style={{
+          background: '#111113',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '32px',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 20px',
+            borderBottom: '1px solid #27272a',
+            background: '#18181b',
+          }}>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              padding: '4px 10px',
+              background: '#f59e0b',
+              color: '#000',
+              borderRadius: '4px',
+            }}>03</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>Repo Structure</span>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div style={{
+              background: '#000',
+              border: '1px solid #27272a',
+              borderRadius: '6px',
+              padding: '16px',
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              color: '#71717a',
+              lineHeight: '1.6',
+              overflowX: 'auto',
+            }}>
+              <pre style={{ margin: 0 }}>{`├── start/              ← Follow along from here
+│   ├── data/           Survey responses, meeting notes
+│   ├── .claude/skills/ Research synthesis skill
+│   └── ...             Templates and scripts
+│
+├── reference/          ← Finished outputs
+│   ├── calendar-integration-prd.md
+│   ├── survey-synthesis.md
+│   └── workspace/      Slides and presentation
+│
+└── README.md           Setup instructions`}</pre>
+            </div>
+            <p style={{
+              marginTop: '16px',
+              fontSize: '14px',
+              color: '#71717a',
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid rgba(34, 197, 94, 0.2)',
+              borderRadius: '6px',
+              padding: '12px 16px',
+            }}>
+              <strong style={{ color: '#22c55e' }}>Tip:</strong> Use <code style={{ background: '#18181b', padding: '2px 6px', borderRadius: '4px' }}>start/</code> to follow along, check <code style={{ background: '#18181b', padding: '2px 6px', borderRadius: '4px' }}>reference/</code> to see the finished result.
+            </p>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section style={{
+          background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.05))',
+          border: '1px solid #b45309',
+          borderRadius: '8px',
+          padding: '40px',
+          textAlign: 'center',
+          marginBottom: '32px',
+        }}>
+          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '12px' }}>Ready to start?</h2>
+          <p style={{ color: '#a1a1aa', marginBottom: '24px' }}>Clone the repo and build something today.</p>
+          <a
+            href="https://github.com/carlvellotti/taskflow-calendar-demo"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackGitHubClick('bottom_cta')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'linear-gradient(135deg, #d97706, #b45309)',
+              color: '#000',
+              padding: '14px 28px',
+              borderRadius: '6px',
+              fontWeight: '600',
+              fontSize: '15px',
+              textDecoration: 'none',
+            }}
+          >
+            → View on GitHub
+          </a>
+        </section>
+
+        {/* Footer */}
+        <footer style={{ textAlign: 'center' }}>
+          <a
+            href="/advanced-cc"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#71717a',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              textDecoration: 'none',
+              border: '1px solid #27272a',
+            }}
+          >
+            ← back to home
+          </a>
+        </footer>
+
       </div>
     </div>
   );
