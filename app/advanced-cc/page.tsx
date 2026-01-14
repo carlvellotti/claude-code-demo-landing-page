@@ -163,7 +163,7 @@ export default function AdvancedClaudeCode() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder="you@email.com"
                 style={{
                   width: '100%',
                   padding: '14px 14px 14px 32px',
